@@ -23,7 +23,7 @@ mkdir -p $PROFILE_DIR
 # Build libraries
 main_indent "building..."
 . $BIN_DIR/steps/compile-mecab       $BUILD_DIR $LIB_DIR $INSTALL_DIR $CACHE_DIR $PROFILE_DIR
-. $BIN_DIR/steps/source-version      $0 $1 $2
+. $BIN_DIR/steps/source-version      $1 $2
 
 # Remove unnecessary files
 main_indent "cleanup"
