@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# Fail fast and fail hard
+set -eo pipefail
+
+# Syntax sugar
+main_indent() {
+    echo "       [+galonia] $*"
+}
+
+# Initlialize
+main_indent "initializing..."
+BIN_DIR=$(cd $(dirname $0); pwd)  # absolute path
+BUILD_DIR=$1                      # /tmp/build_#HASH#
+INSTALL_DIR=$HOME/.vendor         # /app/.vendor
+LIB_DIR=$BIN_DIR/lib              # $BIN_DIR/lib
+CACHE_DIR=$2                      # /app/tmp/cache
+PROFILE_DIR=$BUILD_DIR/.profile.d # $BUILD_DIR/.profile.d
+mkdir -p $INSTALL_DIR
+mkdir -p $CACHE_DIR
+mkdir -p $PROFILE_DIR
+
+# Build libraries
+main_indent "building..."
+. $BIN_DIR/steps/compile-mecab       $BUILD_DIR $LIB_DIR $INSTALL_DIR $CACHE_DIR $PROFILE_DIR
+. $BIN_DIR/steps/source-version      $0 $1 $2
+
+# Remove unnecessary files
+main_indent "cleanup"
+cd $INSTALL_DIR
+find . -name "*.a" -exec rm {} \;
+
+# Store binaries
+(cd $HOME && tar cf - .vendor) | (cd $BUILD_DIR && tar xf -)
+
+main_indent "Galonia complete"
